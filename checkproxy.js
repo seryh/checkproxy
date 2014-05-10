@@ -57,7 +57,7 @@ var runRead = function(cb) {
         }, function() {
             cb(fileDataArray);
         });
-};
+},  goodProxyListAll = [];
 
 async.parallel(
     [runRead],
@@ -74,6 +74,7 @@ async.parallel(
                   console.log('pid'+worker.pid, goodProxyList);
 
                   goodProxyList.forEach(function(goodIpString) {
+                      goodProxyListAll.push(goodIpString);
                       fs.appendFile(goodProxyFileName, util.format('%s\n',goodIpString), function(err) {
                           if(err) console.log(err);
                       });
@@ -88,7 +89,11 @@ async.parallel(
 );
 
 process.on('exit', function(code) {
-    console.log('\nWork finish, result in file: ' + goodProxyFileName);
+    if (goodProxyListAll.length) {
+        console.log('\nWork finish, result in file: %s', goodProxyFileName);
+    } else {
+        console.log('\nWork finish, good proxy not found for file: %s', file);
+    }
 });
 
 
